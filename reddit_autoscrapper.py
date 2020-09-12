@@ -21,7 +21,7 @@ def return_hot_subs(subreddit, num_subs):
     return '\n'.join(''.join(listx[i:i+1]) for i in range(num_subs))
 
 
-def send_email(sub1, sub2, sub3, email, passwrd, num_results):
+def send_email(sub1, sub2, sub3, sender_email, password, receiver_email, num_results):
 
     result1 = return_hot_subs(sub1, num_results)
 
@@ -33,9 +33,9 @@ def send_email(sub1, sub2, sub3, email, passwrd, num_results):
 
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
-    sender_email = email
-    receiver_email = email
-    passwrd = passwrd
+    sender_email = sender_email
+    receiver_email = receiver_email
+    password = password
     message = """\
 Subject: Hi there
     
@@ -48,7 +48,7 @@ Subject: Hi there
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, passwrd)
+        server.login(sender_email, password)
         server.sendmail(sender_email,
                         receiver_email,
                         message.format(result1=result1,
@@ -57,14 +57,16 @@ Subject: Hi there
                         )
 
 
-subreddit1 = reddit.subreddit(((input("what is the first subreddit you would like results from")).lower()).strip())
-subreddit2 = reddit.subreddit(((input("what is the second subreddit you would like results from")).lower()).strip())
-subreddit3 = reddit.subreddit(((input("what is the third subreddit you would like results from")).lower()).strip())
-num_results = int((input("how many results per subreddit")).strip())
-email = input("what email should they be sent to").strip()
-password = input("what is the password of email").strip()
+subreddit1 = reddit.subreddit(((input("what is the first subreddit you would like results from ")).lower()).strip())
+subreddit2 = reddit.subreddit(((input("what is the second subreddit you would like results from ")).lower()).strip())
+subreddit3 = reddit.subreddit(((input("what is the third subreddit you would like results from ")).lower()).strip())
+num_results = int((input("how many results per subreddit ")).strip())
+sender_email = input("what is the sender email address ").strip()
+password = input("what is the password of sender email ").strip()
+receiver_email = input("what email should they be sent to ").strip()
+time1 = input("at what time should the email be sent everyday in YY:ZZ format ").strip()
 
-schedule.every().day.at("03:06").do(send_email(subreddit1, subreddit2, subreddit3, email, password, num_results))
+schedule.every().day.at(time1).do(send_email, subreddit1, subreddit2, subreddit3, sender_email, password, receiver_email, num_results)
 
 while True:
     schedule.run_pending()
